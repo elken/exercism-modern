@@ -160,7 +160,7 @@ METHOD defaults to GET and must be a valid argument to `request'."
    (format "--exercise=%s" (tabulated-list-get-id))
    (format "--track=%s" exercism-current-track)))
 
-;;;autoload
+;;;###autoload
 (defun exercism ()
   "Open the exercism workspace in Dired."
   (interactive)
