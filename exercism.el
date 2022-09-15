@@ -8,7 +8,7 @@
 ;; Modified: September 15, 2022
 ;; Version: 0.0.1
 ;; Homepage: https://github.com/elken/exercism
-;; Package-Requires: ((emacs "26.1"))
+;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -22,6 +22,7 @@
 (require 'async)
 (require 'request)
 (require 'image)
+(require 'svg-lib)
 
 (defgroup exercism nil
   "Settings related to exercism."
@@ -200,12 +201,12 @@ Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
 (define-derived-mode exercism-exercise-mode tabulated-list-mode "exercism-exercise-mode"
   "Major mode for viewing exercism exercises."
   (let* ((exercises (exercism-get-exercises exercism-current-track))
-         (title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise))))))
-    (setq tabulated-list-format (vector
+         (title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise)))))
+         (tabulated-list-format (vector
                                  (list "Exercise" title-width t)
                                  (list "Difficulty" 12 nil)
-                                 (list "Description" 0 nil))
-          tabulated-list-entries (cl-loop
+                                 (list "Description" 0 nil)))
+         (tabulated-list-entries (cl-loop
                                   for exercise in exercises
                                   collect
                                   (progn
@@ -242,22 +243,21 @@ Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
                                                                      :radius 6
                                                                      :background background
                                                                      :foreground foreground))
-                                                    (propertize blurb 'face text-face))))))
-
-          tabulated-list-padding 4)
+                                                    (propertize blurb 'face text-face)))))))
+         (tabulated-list-padding 4))
     (tabulated-list-init-header)
     (use-local-map exercism-exercise-mode-map)
     (tabulated-list-print t)))
 
 (define-derived-mode exercism-track-mode tabulated-list-mode "exercism-track-mode"
   "Major mode for viewing exercism tracks."
-  (let ((tracks (exercism-get-tracks)))
-    (setq tabulated-list-format (vector (list "Title" (+ 6 (cl-loop for track in tracks maximize (length (alist-get 'title track)))) t)
+  (let* ((tracks (exercism-get-tracks))
+         (tabulated-list-format (vector (list "Title" (+ 6 (cl-loop for track in tracks maximize (length (alist-get 'title track)))) t)
                                         (list "Joined" 8 t)
                                         (list "Concepts" 8 nil)
                                         (list "Exercises" 10 nil)
-                                        (list "Solutions" 8 nil))
-          tabulated-list-entries (cl-loop
+                                        (list "Solutions" 8 nil)))
+         (tabulated-list-entries (cl-loop
                                   for track in tracks
                                   collect
                                   (progn
@@ -293,8 +293,8 @@ Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
                                                      "/"
                                                      (number-to-string (if (numberp num-exercises) num-exercises 0)))
                                                     (number-to-string (if (numberp num-learnt-concepts)  num-learnt-concepts 0))
-                                                    (number-to-string (if (numberp num-solutions)  num-solutions 0)))))))
-          tabulated-list-padding 4)
+                                                    (number-to-string (if (numberp num-solutions)  num-solutions 0))))))))
+         (tabulated-list-padding 4))
     (tabulated-list-init-header)
     (use-local-map exercism-track-mode-map)
 
