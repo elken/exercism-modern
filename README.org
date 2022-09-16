@@ -1,0 +1,65 @@
+#+title: Exercism.el
+#+author: Ellis Kenyő
+#+date: 2022-09-16
+#+latex_class: chameleon
+
+A modern interface to [[https://exercism.org][Exercism]].
+
+* Installation
+[[https://github.com/elken/exercism.el/issues/1][Currently]]  depends on [[https://github.com/rougier/svg-lib][svg-lib]]
+which will have to be installed manually, otherwise the steps below should be
+accurate.
+
+** Standard
+Clone the repo, add to your load-path
+** MELPA
+Install using your favourite package manager
+** Doom Emacs
+Append the following to the corresponding file:
+
+*** =packages.el=
+#+begin_src emacs-lisp
+(package! exercism.el
+  :recipe (:type github :repo "elken/exercism.el"))
+#+end_src
+
+*** =config.el=
+#+begin_src emacs-lisp
+(use-package! exercism.el
+  :commands (exercism exercism-view-tracks))
+#+end_src
+
+* Exercism setup
+Currently depends on following the setup mapped out [[https://exercism.org/docs/using/solving-exercises/working-locally][here]], after doing them you
+should be fine to use this.
+
+* Commands
+** =exercism=
+Open dired at the exercism workspace directory.
+** =exercism-view-tracks=
+[[file:.github/assets/tracks.png]]
+
+Main entry point into Exercism; a listing of all the available programming languages that have courses.
+
+Shows your current statistics for overall completion of a track.
+
+Pressing =RET= on a track will open a listing of all the exercises available.
+** =exercism-track-view-exercises=
+[[file:.github/assets/exercises.png]]
+
+Listing of all exercises available for a given track.
+
+Any exercises not yet unlocked are greyed out.
+
+| key | action                            |
+|-----+-----------------------------------|
+| =RET= | Download exercise(s)              |
+| =m=   | Mark an exercise to be downloaded |
+| =u=   | Unmark an exercise                |
+| =t=   | Toggle all marks                  |
+
+A more detailed listing of shortcuts available when navigating exercises is available [[https://github.com/politza/tablist][here]].
+
+** =exercism-submit-buffer=
+Once you're done with an exercise and you're happy the tests pass, invoke this to submit the current buffer to exercism.
+When invoked with the universal argument =C-u= (=SPC u= for Doom Emacs users), prompt for a buffer to submit instead.
