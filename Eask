@@ -12,14 +12,11 @@
 (depends-on "request")
 (depends-on "async")
 (depends-on "tablist")
-(depends-on "svg-lib"
-            :repo "rougier/svg-lib"
-            :fetcher 'github)
+(depends-on "svg-lib")
 
 (development
- (depends-on "el-mock")
- (depends-on "ert-runner")
+ (depends-on "f")
  (depends-on "undercover")
- (depends-on "spinner"))
+ (depends-on "buttercup"))
 
 (setq network-security-level 'low)  ; see https://github.com/jcs090218/setup-emacs-windows/issues/156#issuecomment-932956432

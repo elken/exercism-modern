@@ -22,7 +22,7 @@ lint:
 
 test:
 	$(EASK) install-deps --dev
-	$(EASK) test ert ./test/*.el
+	$(EASK) exec buttercup -L .
 
 clean:
 	$(EASK) clean-all

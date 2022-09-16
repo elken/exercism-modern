@@ -117,7 +117,7 @@ Optionally check FILE-PATH instead."
   (let ((path (expand-file-name (format "icons/%s.svg" slug) exercism-cache-dir)))
     (unless (file-exists-p path)
       (mkdir (file-name-directory path) t)
-      (let* ((url (cdr (assoc slug exercism--icon-urls))))
+      (let ((url (cdr (assoc slug exercism--icon-urls))))
         (request
           url
           :parser #'buffer-string
