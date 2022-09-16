@@ -54,6 +54,11 @@ Defaults to first entry in $PATH, can be overridden if required."
   :group 'exercism
   :type 'string)
 
+(defcustom exercism-missing-icon "https://d24y9kuxp2d7l2.cloudfront.net/assets/graphics/missing-exercise-54cf5afe4add37d9cf717793c91b088a7dd242ef.svg"
+  "URL to icon to use for missing icons."
+  :group 'exercism
+  :type 'string)
+
 (defface exercism-easy-button
   '((((class color) (min-colors 88))
      :background "#EFFFF1" :foreground "#5FB268")
@@ -101,14 +106,23 @@ Optionally check FILE-PATH instead."
 
 (defun exercism--get-icon (slug)
   "Get an icon for SLUG."
-  (let ((path (expand-file-name (format "icons/%s" slug) exercism-cache-dir)))
+  (let ((path (expand-file-name (format "icons/%s.svg" slug) exercism-cache-dir)))
     (unless (file-exists-p path)
       (mkdir (file-name-directory path) t)
-      (async-start
-       `(lambda ()
-          ,(async-inject-variables "\\`\\(exercism--icon-urls\\)\\'")
-          (url-copy-file (cdr (assoc ,slug exercism--icon-urls)) ,path))
-       'ignore))
+      (let* ((url (cdr (assoc slug exercism--icon-urls))))
+        (request
+          url
+          :parser #'buffer-string
+          :success (cl-function
+                    (lambda (&key data &allow-other-keys)
+                      (with-temp-buffer
+                        (insert data)
+                        (setq-local buffer-file-name path)
+                        (save-buffer))))
+          :status-code `((403 . (lambda (&rest _)
+                                  (unless (file-exists-p (expand-file-name "icons/_missing.svg" exercism-cache-dir))
+                                    (url-copy-file exercism-missing-icon (expand-file-name "icons/_missing.svg" exercism-cache-dir)))
+                                  (copy-file (expand-file-name "icons/_missing.svg" exercism-cache-dir) ,path)))))))
     path))
 
 (defun exercism--endpoint->url (endpoint)
@@ -210,9 +224,9 @@ Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
                                   for exercise in exercises
                                   collect
                                   (progn
-                                    (add-to-list 'exercism--icon-urls (cons (alist-get 'slug exercise) (alist-get 'icon_url exercise)))
+                                    (add-to-list 'exercism--icon-urls (cons (format "%s/%s" exercism-current-track (alist-get 'slug exercise)) (alist-get 'icon_url exercise)))
                                     (let* ((slug (alist-get 'slug exercise))
-                                           (icon (exercism--get-icon slug))
+                                           (icon (exercism--get-icon (format "%s/%s" exercism-current-track (alist-get 'slug exercise))))
                                            (title (alist-get 'title exercise))
                                            (blurb (alist-get 'blurb exercise))
                                            (difficulty (alist-get 'difficulty exercise))
