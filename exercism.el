@@ -91,7 +91,7 @@ Defaults to first entry in $PATH, can be overridden if required."
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "<return>") #'exercism-download-exercise)
     map)
-  "Keymap for `exercism-track-mode'.")
+  "Keymap for `exercism-exercise-mode'.")
 
 ;;;###autoload
 (defun exercism-get-config (&optional file-path)
