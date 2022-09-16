@@ -1,4 +1,4 @@
-;;; exercism.el --- Emacs interface for exercism.io -*- lexical-binding: t; -*-
+;;; exercism.el --- Modern interface for exercism -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2022 Ellis Kenyő
 ;;
@@ -8,13 +8,20 @@
 ;; Modified: September 15, 2022
 ;; Version: 0.0.1
 ;; Homepage: https://github.com/elken/exercism
-;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3") (tablist "1.0"))
+;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3") (tablist "1.0") (svg-lib "0.2.5"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
 ;;
+;; Modern interface for exercism
 ;;
+;; Maps out most of the web interface to be usable in emacs.
+;;
+;; `exercism' => open a dired buffer in the exercism workspace
+;; `exercism-view-tracks' => open a buffer of all the available tracks, which can be selected with RET
+;; `exercism-track-view-exercises' => open a buffer of all available exercises for the last selected track
+;; `exercism-submit-buffer' => Submit the current buffer to exercism. Invoke with universal argument to pick a buffer.
 ;;
 ;;; Code:
 
