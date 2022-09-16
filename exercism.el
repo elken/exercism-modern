@@ -8,7 +8,7 @@
 ;; Modified: September 15, 2022
 ;; Version: 0.0.1
 ;; Homepage: https://github.com/elken/exercism
-;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3"))
+;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3") (tablist "1.0"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -23,6 +23,7 @@
 (require 'request)
 (require 'image)
 (require 'svg-lib)
+(require 'tablist)
 
 (defgroup exercism nil
   "Settings related to exercism."
@@ -163,15 +164,17 @@ METHOD defaults to GET and must be a valid argument to `request'."
 (defun exercism-download-exercise ()
   "Download a given exercise."
   (interactive)
-  (async-start-process
-   "exercism-download"
-   exercism-command
-   (lambda (proc)
-     ;; TODO Handle errors
-     (message "Exercise cloned"))
-   "download"
-   (format "--exercise=%s" (tabulated-list-get-id))
-   (format "--track=%s" exercism-current-track)))
+  (cl-loop
+   for exercise in (mapcar #'car (tablist-get-marked-items))
+   do (async-start-process
+       "exercism-download"
+       exercism-command
+       (lambda (proc)
+         ;; TODO Handle errors
+         (message "Exercise cloned"))
+       "download"
+       (format "--exercise=%s" exercise)
+       (format "--track=%s" exercism-current-track))))
 
 ;;;###autoload
 (defun exercism ()
@@ -211,7 +214,7 @@ Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
   (pop-to-buffer "*exercism-tracks*" nil)
   (exercism-track-mode))
 
-(define-derived-mode exercism-exercise-mode tabulated-list-mode "exercism-exercise-mode"
+(define-derived-mode exercism-exercise-mode tablist-mode "exercism-exercise-mode"
   "Major mode for viewing exercism exercises."
   (let* ((exercises (exercism-get-exercises exercism-current-track)))
     (setq title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise))))
@@ -260,7 +263,8 @@ Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
           tabulated-list-padding 4)
     (tabulated-list-init-header)
     (use-local-map exercism-exercise-mode-map)
-    (tabulated-list-print t)))
+    (tabulated-list-print t)
+    (tablist-minor-mode)))
 
 (define-derived-mode exercism-track-mode tabulated-list-mode "exercism-track-mode"
   "Major mode for viewing exercism tracks."
