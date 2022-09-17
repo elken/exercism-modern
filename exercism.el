@@ -138,7 +138,9 @@ METHOD defaults to GET and must be a valid argument to `request'."
     (request
       (exercism--endpoint->url endpoint)
       :type (or method "GET")
-      :parser #'json-read
+      :parser (lambda ()
+                (let ((json-array-type 'list))
+                  (json-read)))
       :headers `(("Authorization" . ,(concat "Bearer " (alist-get 'token (exercism-get-config)))))
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
@@ -152,14 +154,11 @@ METHOD defaults to GET and must be a valid argument to `request'."
     (thread-first (alist-get 'tracks tracks)
                   (cl-sort (lambda (lhs rhs)
                              (and (string< (alist-get 'slug lhs) (alist-get 'slug rhs))
-                                  (and (alist-get 'is_joined lhs) (alist-get 'is_joined rhs)))))
-                  (append nil))))
+                                  (and (alist-get 'is_joined lhs) (alist-get 'is_joined rhs))))))))
 
 (defun exercism-get-exercises (language)
   "Get all exercises for a LANGUAGE slug."
-  (let ((exercises (exercism-request (format "tracks/%s/exercises" language))))
-    (thread-first (alist-get 'exercises exercises)
-                  (append nil))))
+  (alist-get 'exercises (exercism-request (format "tracks/%s/exercises" language))))
 
 (defun exercism-download-exercise ()
   "Download a given exercise."
