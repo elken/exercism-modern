@@ -118,7 +118,7 @@ Optionally check FILE-PATH instead."
                     (lambda (&key data &allow-other-keys)
                       (with-temp-buffer
                         (insert data)
-                        (write-file path))))
+                        (write-region (point-min) (point-max) path))))
           :status-code `((403 . (lambda (&rest _)
                                   (unless (file-exists-p (expand-file-name "icons/_missing.svg" exercism-cache-dir))
                                     (url-copy-file exercism-missing-icon (expand-file-name "icons/_missing.svg" exercism-cache-dir)))
