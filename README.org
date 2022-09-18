@@ -33,6 +33,10 @@ Append the following to the corresponding file:
 Currently depends on following the setup mapped out [[https://exercism.org/docs/using/solving-exercises/working-locally][here]], after doing them you
 should be fine to use this.
 
+*NOTE* the first time you view the tracks/a specific track there will be a
+one-time delay while the icons are downloaded. This will only occur once per the
+main tracks view and one per track
+
 * Commands
 ** =exercism=
 Open dired at the exercism workspace directory.
