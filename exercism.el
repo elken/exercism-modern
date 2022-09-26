@@ -189,19 +189,24 @@ METHOD defaults to GET and must be a valid argument to `request'."
   (dired (alist-get 'workspace (exercism-get-config))))
 
 ;;;###autoload
-(defun exercism-submit-buffer (&optional buffer-or-arg)
-  "Submit the current buffer as to exercism.
-Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
+(defun exercism-submit (&optional buffer-prefix-arg)
+  "Submit the current exercise.
+Uses exercism metadata to get the correct file for submission.
+Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
   (interactive (when (and current-prefix-arg)
                  (list (read-buffer "Buffer to submit: "))))
-  (let ((buffer (buffer-file-name (or buffer-or-arg (current-buffer)))))
+  (let ((solutions (map-nested-elt
+                    (exercism-get-config
+                     (expand-file-name ".exercism/config.json" (locate-dominating-file "." ".exercism")))
+                    '(files solution))))
     (async-start-process
      "exercism-submit"
      exercism-command
      (lambda (proc)
        ;; TODO Handle submission errors
        (message "Submitted"))
-     "submit" buffer)))
+     "submit" (if buffer-prefix-arg (buffer-file-name buffer-prefix-arg)
+                (mapconcat 'identity solutions " ")))))
 
 
 ;;;###autoload
