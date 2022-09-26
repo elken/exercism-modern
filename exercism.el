@@ -1,4 +1,4 @@
-;;; exercism.el --- Emacs interface for exercism.io -*- lexical-binding: t; -*-
+;;; exercism.el --- Modern interface for exercism -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2022 Ellis Kenyő
 ;;
@@ -8,13 +8,20 @@
 ;; Modified: September 15, 2022
 ;; Version: 0.0.1
 ;; Homepage: https://github.com/elken/exercism
-;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3") (tablist "1.0"))
+;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3") (tablist "1.0") (svg-lib "0.2.5"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
 ;;
+;; Modern interface for exercism
 ;;
+;; Maps out most of the web interface to be usable in emacs.
+;;
+;; `exercism' => open a dired buffer in the exercism workspace
+;; `exercism-view-tracks' => open a buffer of all the available tracks, which can be selected with RET
+;; `exercism-track-view-exercises' => open a buffer of all available exercises for the last selected track
+;; `exercism-submit-buffer' => Submit the current buffer to exercism. Invoke with universal argument to pick a buffer.
 ;;
 ;;; Code:
 
@@ -110,7 +117,7 @@ Optionally check FILE-PATH instead."
   (let ((path (expand-file-name (format "icons/%s.svg" slug) exercism-cache-dir)))
     (unless (file-exists-p path)
       (mkdir (file-name-directory path) t)
-      (let* ((url (cdr (assoc slug exercism--icon-urls))))
+      (let ((url (cdr (assoc slug exercism--icon-urls))))
         (request
           url
           :parser #'buffer-string
@@ -182,19 +189,24 @@ METHOD defaults to GET and must be a valid argument to `request'."
   (dired (alist-get 'workspace (exercism-get-config))))
 
 ;;;###autoload
-(defun exercism-submit-buffer (&optional buffer-or-arg)
-  "Submit the current buffer as to exercism.
-Pass prefix BUFFER-OR-ARG to prompt for a buffer instead."
+(defun exercism-submit (&optional buffer-prefix-arg)
+  "Submit the current exercise.
+Uses exercism metadata to get the correct file for submission.
+Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
   (interactive (when (and current-prefix-arg)
                  (list (read-buffer "Buffer to submit: "))))
-  (let ((buffer (buffer-file-name (or buffer-or-arg (current-buffer)))))
+  (let ((solutions (map-nested-elt
+                    (exercism-get-config
+                     (expand-file-name ".exercism/config.json" (locate-dominating-file "." ".exercism")))
+                    '(files solution))))
     (async-start-process
      "exercism-submit"
      exercism-command
      (lambda (proc)
        ;; TODO Handle submission errors
        (message "Submitted"))
-     "submit" buffer)))
+     "submit" (if buffer-prefix-arg (buffer-file-name buffer-prefix-arg)
+                (mapconcat 'identity solutions " ")))))
 
 
 ;;;###autoload
