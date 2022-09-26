@@ -28,7 +28,7 @@
   (undercover "*.el"
               (:exclude "*-test.el")))
 
-(require 'exercism (f-expand "exercism.el" (f-parent (f-parent (f-this-file)))))
+(require 'exercism-modern (f-expand "exercism-modern.el" (f-parent (f-parent (f-this-file)))))
 
 (provide 'test-helper)
 ;;; test-helper.el ends here

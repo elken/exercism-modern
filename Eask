@@ -1,7 +1,7 @@
-(package "exercism" "0.0.1" "Modern interface for exercism")
-(website-url "https://github.com/elken/exercism")
+(package "exercism-modern" "0.0.1" "Modern interface for exercism")
+(website-url "https://github.com/elken/exercism-modern")
 
-(package-file "exercism.el")
+(package-file "exercism-modern.el")
 
 (files "*.el")
 
