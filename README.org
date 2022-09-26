@@ -20,7 +20,7 @@ Append the following to the corresponding file:
 *** =packages.el=
 #+begin_src emacs-lisp
 (package! exercism.el
-  :recipe (:type github :repo "elken/exercism.el"))
+  :recipe (:host github :repo "elken/exercism.el"))
 #+end_src
 
 *** =config.el=
