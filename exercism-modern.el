@@ -4,10 +4,11 @@
 ;;
 ;; Author: Ellis Kenyő <me@elken.dev>
 ;; Maintainer: Ellis Kenyő <me@elken.dev>
+;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Created: September 15, 2022
 ;; Modified: September 15, 2022
 ;; Version: 0.0.1
-;; Homepage: https://github.com/elken/exercism
+;; Homepage: https://github.com/elken/exercism-modern
 ;; Package-Requires: ((emacs "26.1") (request "0.2.0") (async "1.9.3") (tablist "1.0") (svg-lib "0.2.5"))
 ;;
 ;; This file is not part of GNU Emacs.
