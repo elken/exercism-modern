@@ -1,4 +1,4 @@
-;;; exercism-modern --- Modern interface for exercism -*- lexical-binding: t; -*-
+;;; exercism-modern.el --- Modern interface for exercism -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (C) 2022 Ellis Kenyő
 ;;
@@ -17,9 +17,9 @@
 ;;
 ;; Modern interface for exercism
 ;;
-;; Maps out most of the web interface to be usable in emacs.
+;; Maps out most of the web interface to be usable in Emacs.
 ;;
-;; `exercism-modern-jump' => open a dired buffer in the exercism workspace
+;; `exercism-modern-jump' => open a Dired buffer in the exercism workspace
 ;; `exercism-modern-view-tracks' => open a buffer of all the available tracks, which can be selected with RET
 ;; `exercism-modern-track-view-exercises' => open a buffer of all available exercises for the last selected track
 ;; `exercism-modern-submit' => Submit the solution files to exercism. Invoke with universal argument to pick a buffer.
@@ -329,4 +329,5 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
     (tabulated-list-print t)))
 
 (provide 'exercism-modern)
-;;; exercism-modern ends here
+
+;;; exercism-modern.el ends here
