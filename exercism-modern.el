@@ -249,8 +249,11 @@ into 'python' as its track."
                              (when (string-match (concat workspace "/\\([^/]+\\)/.*") file-name)
                                (match-string 1 file-name)))))
         (setq exercism-modern-current-track track))))
+  (message "Fetching exercise list for %s track..." exercism-modern-current-track)
   (pop-to-buffer (format "*exercism-modern-%s*" exercism-modern-current-track) nil)
-  (exercism-modern-exercise-mode))
+  (exercism-modern-exercise-mode)
+  ;; clear any previous messages
+  (message ""))
 
 ;;;###autoload
 (defun exercism-modern-view-tracks ()
