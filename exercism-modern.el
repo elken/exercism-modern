@@ -73,6 +73,11 @@ Defaults to first entry in $PATH, can be overridden if required."
 (defvar exercism-modern-current-track nil
   "Current track to pull exercises for.")
 
+(defcustom exercism-modern-star-icon (exercism-modern--load-from-package-root "icons/star.svg")
+  "Path to icon to use for recommended exercises."
+  :type 'file
+  :group 'exercism-modern)
+
 (defvar exercism-modern-track-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "<return>") #'exercism-modern-track-view-exercises)
