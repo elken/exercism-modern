@@ -229,10 +229,26 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
 
 ;;;###autoload
 (defun exercism-modern-track-view-exercises ()
-  "Invoked from `exercism-modern-track-mode', load the exercises for a given track."
+  "Invoked from `exercism-modern-track-mode', load the exercises for a given track.
+
+Alternatively, can be invoked from a buffer visiting a exercism
+file in its workspace. The track is determined by the current
+buffer's relative location to the exercism configured workspace,
+e.g. a workspace configuation of '~/foo/exercism' will
+transform a buffer of ~/foo/exercism/python/two-fer/two_fer.py
+into 'python' as its track."
   (interactive)
   (when (eq major-mode 'exercism-modern-track-mode)
     (setq exercism-modern-current-track (tabulated-list-get-id)))
+  ;; try to guess track if we get to this point and
+  ;; `exercism-modern-current-track' is nil
+  (unless exercism-modern-current-track
+    (let ((file-name (buffer-file-name))
+          (workspace (alist-get 'workspace (exercism-modern-get-config))))
+      (when-let ((track (and (string-prefix-p workspace file-name)
+                             (when (string-match (concat workspace "/\\([^/]+\\)/.*") file-name)
+                               (match-string 1 file-name)))))
+        (setq exercism-modern-current-track track))))
   (pop-to-buffer (format "*exercism-modern-%s*" exercism-modern-current-track) nil)
   (exercism-modern-exercise-mode))
 
