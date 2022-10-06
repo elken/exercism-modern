@@ -188,17 +188,21 @@ METHOD defaults to GET and must be a valid argument to `request'."
 (defun exercism-modern-download-exercise ()
   "Download a given exercise."
   (interactive)
-  (cl-loop
-   for exercise in (mapcar #'car (tablist-get-marked-items))
-   do (async-start-process
-       "exercism-modern-download"
-       exercism-modern-command
-       (lambda (proc)
-         ;; TODO Handle errors
-         (message "Exercise cloned"))
-       "download"
-       (format "--exercise=%s" exercise)
-       (format "--track=%s" exercism-modern-current-track))))
+  (let ((items (mapcar #'car (tablist-get-marked-items))))
+    (if (eq 1 (length items))
+        (message "Downloading %s/%s..." exercism-modern-current-track (nth 0 items))
+      (message "Downloading %d exercises..." (length items)))
+    (cl-loop
+     for exercise in items
+     do (async-start-process
+         "exercism-modern-download"
+         exercism-modern-command
+         (lambda (proc)
+           ;; TODO Handle errors
+           (message "Exercise(s) cloned"))
+         "download"
+         (format "--exercise=%s" exercise)
+         (format "--track=%s" exercism-modern-current-track)))))
 
 ;;;###autoload
 (defun exercism-modern-jump ()
