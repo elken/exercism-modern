@@ -37,8 +37,8 @@ jobs:
       - name: Install Exercism
         if: matrix.os == 'ubuntu-latest'
         run: |
-          wget https://github.com/exercism/cli/releases/latest/download/exercism-linux-64bit.tgz
-          tar -xf exercism-linux-64bit.tgz
+          wget https://github.com/exercism/cli/releases/download/v3.1.0/exercism-3.1.0-linux-x86_64.tar.gz
+          tar -xf exercism-3.1.0-linux-x86_64.tar.gz
           mv exercism /usr/local/bin
 
       - uses: actions/setup-node@v2
