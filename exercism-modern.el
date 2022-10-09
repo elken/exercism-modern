@@ -9,7 +9,7 @@
 ;; Modified: September 15, 2022
 ;; Version: 0.0.1
 ;; Homepage: https://github.com/elken/exercism-modern
-;; Package-Requires: ((emacs "27.1") (request "0.2.0") (async "1.9.3") (tablist "1.0") (svg-lib "0.2.5"))
+;; Package-Requires: ((emacs "27.1") (request "0.2.0") (async "1.9.3") (tablist "1.0"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -30,7 +30,6 @@
 (require 'async)
 (require 'request)
 (require 'image)
-(require 'svg-lib)
 (require 'tablist)
 
 (defgroup exercism-modern nil
@@ -68,27 +67,6 @@ Defaults to first entry in $PATH, can be overridden if required."
   :group 'exercism-modern
   :type 'string)
 
-(defface exercism-modern-easy-button
-  '((((class color) (min-colors 88))
-     :background "#EFFFF1" :foreground "#5FB268")
-    (t :background "lightgreen" :foreground "darkgreen"))
-  "Face used for easy difficulty exercises."
-  :group 'exercism-modern-faces)
-
-(defface exercism-modern-medium-button
-  '((((class color) (min-colors 88))
-     :background "#F7F5E0" :foreground "#A5A256")
-    (t :background "lightyellow" :foreground "darkyellow"))
-  "Face used for easy difficulty exercises."
-  :group 'exercism-modern-faces)
-
-(defface exercism-modern-hard-button
-  '((((class color) (min-colors 88))
-     :background "#F4EBE5" :foreground "#CB8D6A")
-    (t :background "lightorange" :foreground "lightorange"))
-  "Face used for easy difficulty exercises."
-  :group 'exercism-modern-faces)
-
 (defvar exercism-modern--icon-urls nil
   "Alist of (slug . iconUrl).")
 
@@ -112,6 +90,13 @@ Defaults to first entry in $PATH, can be overridden if required."
   "Return parsed JSON config.
 Optionally check FILE-PATH instead."
   (json-read-file (or file-path exercism-modern-config-file)))
+
+(defun exercism-modern--load-from-package-root (path)
+  "Load PATH relative to the package directory."
+  (expand-file-name
+   path
+   (file-name-directory
+    (symbol-file 'exercism-modern))))
 
 (defun exercism-modern--get-icon (slug)
   "Get an icon for SLUG."
@@ -247,8 +232,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (is-unlocked (not (eq :json-false (alist-get 'is_unlocked exercise))))
                                            (is-recommended (not (eq :json-false (alist-get 'is_recommended exercise))))
                                            (text-face (if is-unlocked 'default 'shadow))
-                                           (foreground (face-attribute (intern (format "exercism-%s-button" difficulty)) :foreground))
-                                           (background (face-attribute (intern (format "exercism-%s-button" difficulty)) :background)))
+                                           (difficulty-svg (exercism-modern--load-from-package-root (concat "icons/" difficulty ".svg"))))
                                       (list slug
                                             (vector (concat
                                                      (propertize "  " 'face 'warning)
@@ -258,19 +242,19 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                                       `(image
                                                         :margin (2 . 2)
                                                         :ascent center
-                                                        :width 15
+                                                        :width ,(font-get (face-attribute 'default :font) :size)
                                                         :type ,(image-type (alist-get 'icon_url exercise))
                                                         :file ,icon))
                                                      (propertize title 'face text-face))
                                                     (propertize
                                                      " "
                                                      'display
-                                                     (svg-lib-button "square" (capitalize difficulty) nil
-                                                                     :font-weight 900
-                                                                     :scale 0.6
-                                                                     :radius 6
-                                                                     :background background
-                                                                     :foreground foreground))
+                                                     `(image
+                                                       :margin (2 . 2)
+                                                       :ascent center
+                                                       :width ,(* 4 (font-get (face-attribute 'default :font) :size))
+                                                       :type ,(image-type difficulty-svg)
+                                                       :file ,difficulty-svg))
                                                     (propertize blurb 'face text-face))))))
           tabulated-list-padding 4)
     (tabulated-list-init-header)
@@ -308,11 +292,19 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                                       `(image
                                                         :margin (2 . 2)
                                                         :ascent center
-                                                        :width 15
+                                                        :width ,(font-get (face-attribute 'default :font) :size)
                                                         :type ,(image-type (alist-get 'icon_url track))
                                                         :file ,icon))
                                                      title)
-                                                    (if is-joined (propertize "" 'face 'success) (propertize "" 'face 'error))
+                                                    (propertize
+                                                     " "
+                                                     'display
+                                                     `(image
+                                                       :margin (2 . 2)
+                                                       :ascent center
+                                                       :width ,(font-get (face-attribute 'default :font) :size)
+                                                       :type ,(image-type (alist-get 'icon_url track))
+                                                       :file ,(exercism-modern--load-from-package-root (concat "icons/" (if is-joined "true" "false") ".svg"))))
                                                     (concat
                                                      (number-to-string (if (numberp num-learnt-concepts) num-learnt-concepts 0))
                                                      "/"
