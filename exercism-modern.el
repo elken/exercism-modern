@@ -213,9 +213,9 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
 
 (define-derived-mode exercism-modern-exercise-mode tablist-mode "exercism-modern-exercise-mode"
   "Major mode for viewing exercism exercises."
-  (let* ((exercises (exercism-modern-get-exercises exercism-modern-current-track)))
-    (setq title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise))))
-          tabulated-list-format (vector
+  (let* ((exercises (exercism-modern-get-exercises exercism-modern-current-track))
+         (title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise))))))
+    (setq tabulated-list-format (vector
                                  (list "Exercise" title-width t)
                                  (list "Difficulty" 12 nil)
                                  (list "Description" 0 nil))
@@ -235,7 +235,8 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (difficulty-svg (exercism-modern--load-from-package-root (concat "icons/" difficulty ".svg"))))
                                       (list slug
                                             (vector (concat
-                                                     (propertize "  " 'face 'warning)
+                                                     (when is-recommended
+                                                       (propertize "  " 'face 'exercism-modern-warning))
                                                      (propertize
                                                       " "
                                                       'display
