@@ -221,6 +221,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
   (let* ((exercises (exercism-modern-get-exercises exercism-modern-current-track))
          (title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise))))))
     (setq tabulated-list-format (vector
+                                 (list "" 2 nil) ; is-recommended column
                                  (list "Exercise" title-width t)
                                  (list "Difficulty" 12 nil)
                                  (list "Description" 0 nil))
@@ -239,9 +240,18 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (text-face (if is-unlocked 'default 'shadow))
                                            (difficulty-svg (exercism-modern--load-from-package-root (concat "icons/" difficulty ".svg"))))
                                       (list slug
-                                            (vector (concat
-                                                     (when is-recommended
-                                                       (propertize "  " 'face 'exercism-modern-warning))
+                                            (vector (if is-recommended
+                                                        (propertize
+                                                         " "
+                                                         'display
+                                                         `(image
+                                                           :margin (2 . 2)
+                                                           :ascent center
+                                                           :width ,(font-get (face-attribute 'default :font) :size)
+                                                           :type ,(image-type exercism-modern-star-icon)
+                                                           :file ,exercism-modern-star-icon))
+                                                      "")
+                                                    (concat
                                                      (propertize
                                                       " "
                                                       'display
