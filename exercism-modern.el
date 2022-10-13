@@ -73,6 +73,15 @@ Defaults to first entry in $PATH, can be overridden if required."
 (defvar exercism-modern-current-track nil
   "Current track to pull exercises for.")
 
+(defvar exercism-modern--load-path (file-name-directory load-file-name)
+  "Load path for the package so as to find media files.")
+
+(defun exercism-modern--load-from-package-root (path)
+  "Load PATH relative to the package directory."
+  (expand-file-name
+   path
+   (file-name-directory exercism-modern--load-path)))
+
 (defcustom exercism-modern-star-icon (exercism-modern--load-from-package-root "icons/star.svg")
   "Path to icon to use for recommended exercises."
   :type 'file
@@ -120,13 +129,6 @@ Defaults to first entry in $PATH, can be overridden if required."
   "Return parsed JSON config.
 Optionally check FILE-PATH instead."
   (json-read-file (or file-path exercism-modern-config-file)))
-
-(defun exercism-modern--load-from-package-root (path)
-  "Load PATH relative to the package directory."
-  (expand-file-name
-   path
-   (file-name-directory
-    (symbol-file 'exercism-modern))))
 
 (defun exercism-modern--get-icon (slug)
   "Get an icon for SLUG."
