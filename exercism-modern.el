@@ -78,6 +78,31 @@ Defaults to first entry in $PATH, can be overridden if required."
   :type 'file
   :group 'exercism-modern)
 
+(defcustom exercism-modern-easy-icon (exercism-modern--load-from-package-root "icons/easy.svg")
+  "Path to icon to use for difficulty level easy exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-medium-icon (exercism-modern--load-from-package-root "icons/medium.svg")
+  "Path to icon to use for difficulty level medium exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-hard-icon (exercism-modern--load-from-package-root "icons/hard.svg")
+  "Path to icon to use for difficulty leve hard exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-success-icon (exercism-modern--load-from-package-root "icons/true.svg")
+  "Path to icon to use for a success or true indication."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-failure-icon (exercism-modern--load-from-package-root "icons/false.svg")
+  "Path to icon to use for  a failure or false indication."
+  :type 'file
+  :group 'exercism-modern)
+
 (defvar exercism-modern-track-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "<return>") #'exercism-modern-track-view-exercises)
@@ -238,7 +263,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (is-unlocked (not (eq :json-false (alist-get 'is_unlocked exercise))))
                                            (is-recommended (not (eq :json-false (alist-get 'is_recommended exercise))))
                                            (text-face (if is-unlocked 'default 'shadow))
-                                           (difficulty-svg (exercism-modern--load-from-package-root (concat "icons/" difficulty ".svg"))))
+                                           (difficulty-svg (symbol-value (intern (concat "exercism-modern-" difficulty "-icon")))))
                                       (list slug
                                             (vector (if is-recommended
                                                         (propertize
@@ -297,6 +322,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (num-concepts (alist-get 'num_concepts track))
                                            (num-exercises (alist-get 'num_exercises track))
                                            (is-joined (alist-get 'is_joined track))
+                                           (join-icon (if is-joined exercism-modern-success-icon exercism-modern-failure-icon))
                                            (num-learnt-concepts (alist-get 'num_learnt_concepts track))
                                            (num-completed-exercises (alist-get 'num_completed_exercises track))
                                            (num-solutions (alist-get 'num_solutions track)))
@@ -309,7 +335,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                                         :margin (2 . 2)
                                                         :ascent center
                                                         :width ,(font-get (face-attribute 'default :font) :size)
-                                                        :type ,(image-type (alist-get 'icon_url track))
+                                                        :type ,(image-type icon)
                                                         :file ,icon))
                                                      title)
                                                     (propertize
@@ -319,8 +345,8 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                                        :margin (2 . 2)
                                                        :ascent center
                                                        :width ,(font-get (face-attribute 'default :font) :size)
-                                                       :type ,(image-type (alist-get 'icon_url track))
-                                                       :file ,(exercism-modern--load-from-package-root (concat "icons/" (if is-joined "true" "false") ".svg"))))
+                                                       :type ,(image-type join-icon)
+                                                       :file ,join-icon))
                                                     (concat
                                                      (number-to-string (if (numberp num-learnt-concepts) num-learnt-concepts 0))
                                                      "/"
