@@ -8,10 +8,6 @@
 A modern interface to [[https://exercism.org][Exercism]].
 
 * Installation
-[[https://github.com/elken/exercism-modern/issues/1][Currently]]  depends on [[https://github.com/rougier/svg-lib][svg-lib]]
-which will have to be installed manually, otherwise the steps below should be
-accurate.
-
 ** Standard
 Clone the repo, add to your load-path
 ** MELPA
