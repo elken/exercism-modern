@@ -73,6 +73,45 @@ Defaults to first entry in $PATH, can be overridden if required."
 (defvar exercism-modern-current-track nil
   "Current track to pull exercises for.")
 
+(defvar exercism-modern--load-path (file-name-directory load-file-name)
+  "Load path for the package so as to find media files.")
+
+(defun exercism-modern--load-from-package-root (path)
+  "Load PATH relative to the package directory."
+  (expand-file-name
+   path
+   (file-name-directory exercism-modern--load-path)))
+
+(defcustom exercism-modern-star-icon (exercism-modern--load-from-package-root "icons/star.svg")
+  "Path to icon to use for recommended exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-easy-icon (exercism-modern--load-from-package-root "icons/easy.svg")
+  "Path to icon to use for difficulty level easy exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-medium-icon (exercism-modern--load-from-package-root "icons/medium.svg")
+  "Path to icon to use for difficulty level medium exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-hard-icon (exercism-modern--load-from-package-root "icons/hard.svg")
+  "Path to icon to use for difficulty leve hard exercises."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-success-icon (exercism-modern--load-from-package-root "icons/true.svg")
+  "Path to icon to use for a success or true indication."
+  :type 'file
+  :group 'exercism-modern)
+
+(defcustom exercism-modern-failure-icon (exercism-modern--load-from-package-root "icons/false.svg")
+  "Path to icon to use for  a failure or false indication."
+  :type 'file
+  :group 'exercism-modern)
+
 (defvar exercism-modern-track-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "<return>") #'exercism-modern-track-view-exercises)
@@ -90,13 +129,6 @@ Defaults to first entry in $PATH, can be overridden if required."
   "Return parsed JSON config.
 Optionally check FILE-PATH instead."
   (json-read-file (or file-path exercism-modern-config-file)))
-
-(defun exercism-modern--load-from-package-root (path)
-  "Load PATH relative to the package directory."
-  (expand-file-name
-   path
-   (file-name-directory
-    (symbol-file 'exercism-modern))))
 
 (defun exercism-modern--get-icon (slug)
   "Get an icon for SLUG."
@@ -216,6 +248,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
   (let* ((exercises (exercism-modern-get-exercises exercism-modern-current-track))
          (title-width (+ 6 (cl-loop for exercise in exercises maximize (length (alist-get 'title exercise))))))
     (setq tabulated-list-format (vector
+                                 (list "" 2 nil) ; is-recommended column
                                  (list "Exercise" title-width t)
                                  (list "Difficulty" 12 nil)
                                  (list "Description" 0 nil))
@@ -232,11 +265,20 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (is-unlocked (not (eq :json-false (alist-get 'is_unlocked exercise))))
                                            (is-recommended (not (eq :json-false (alist-get 'is_recommended exercise))))
                                            (text-face (if is-unlocked 'default 'shadow))
-                                           (difficulty-svg (exercism-modern--load-from-package-root (concat "icons/" difficulty ".svg"))))
+                                           (difficulty-svg (symbol-value (intern (concat "exercism-modern-" difficulty "-icon")))))
                                       (list slug
-                                            (vector (concat
-                                                     (when is-recommended
-                                                       (propertize "  " 'face 'exercism-modern-warning))
+                                            (vector (if is-recommended
+                                                        (propertize
+                                                         " "
+                                                         'display
+                                                         `(image
+                                                           :margin (2 . 2)
+                                                           :ascent center
+                                                           :width ,(font-get (face-attribute 'default :font) :size)
+                                                           :type ,(image-type exercism-modern-star-icon)
+                                                           :file ,exercism-modern-star-icon))
+                                                      "")
+                                                    (concat
                                                      (propertize
                                                       " "
                                                       'display
@@ -282,6 +324,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                            (num-concepts (alist-get 'num_concepts track))
                                            (num-exercises (alist-get 'num_exercises track))
                                            (is-joined (alist-get 'is_joined track))
+                                           (join-icon (if is-joined exercism-modern-success-icon exercism-modern-failure-icon))
                                            (num-learnt-concepts (alist-get 'num_learnt_concepts track))
                                            (num-completed-exercises (alist-get 'num_completed_exercises track))
                                            (num-solutions (alist-get 'num_solutions track)))
@@ -294,7 +337,7 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                                         :margin (2 . 2)
                                                         :ascent center
                                                         :width ,(font-get (face-attribute 'default :font) :size)
-                                                        :type ,(image-type (alist-get 'icon_url track))
+                                                        :type ,(image-type icon)
                                                         :file ,icon))
                                                      title)
                                                     (propertize
@@ -304,8 +347,8 @@ Pass prefix BUFFER-PREFIX-ARG to prompt for a buffer instead."
                                                        :margin (2 . 2)
                                                        :ascent center
                                                        :width ,(font-get (face-attribute 'default :font) :size)
-                                                       :type ,(image-type (alist-get 'icon_url track))
-                                                       :file ,(exercism-modern--load-from-package-root (concat "icons/" (if is-joined "true" "false") ".svg"))))
+                                                       :type ,(image-type join-icon)
+                                                       :file ,join-icon))
                                                     (concat
                                                      (number-to-string (if (numberp num-learnt-concepts) num-learnt-concepts 0))
                                                      "/"
