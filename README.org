@@ -22,7 +22,8 @@ Append the following to the corresponding file:
 *** =packages.el=
 #+begin_src emacs-lisp
 (package! exercism-modern
-  :recipe (:host github :repo "elken/exercism-modern"))
+  :recipe (:files (:defaults "icons")
+           :host github :repo "elken/exercism-modern"))
 #+end_src
 
 *** =config.el=
