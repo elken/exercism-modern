@@ -12,7 +12,6 @@
 (depends-on "request")
 (depends-on "async")
 (depends-on "tablist")
-(depends-on "svg-lib")
 
 (development
  (depends-on "f")
