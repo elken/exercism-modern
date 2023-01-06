@@ -10,8 +10,6 @@ A modern interface to [[https://exercism.org][Exercism]].
 * Installation
 ** Standard
 Clone the repo, add to your load-path
-** MELPA
-Install using your favourite package manager
 ** Doom Emacs
 Append the following to the corresponding file:
 
